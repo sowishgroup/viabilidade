@@ -1,0 +1,31 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+/* Fundo do app: imagem vertical no celular, horizontal no desktop/tablet */
+body {
+  @apply text-slate-900 antialiased;
+  min-height: 100vh;
+  background-color: #0f172a;
+  background-image:
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.42) 0%, rgba(15, 23, 42, 0.28) 100%),
+    url("/bg-mobile.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@media (min-width: 1024px) {
+  body {
+    background-image:
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.38) 0%, rgba(15, 23, 42, 0.22) 100%),
+      url("/bg-desktop.png");
+  }
+}
+
+/* Fallback se as imagens não carregarem */
+@supports not (background-image: url("/bg-mobile.png")) {
+  body {
+    background-image: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  }
+}

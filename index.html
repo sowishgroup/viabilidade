@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo-sowish.png" />
+    <link rel="apple-touch-icon" href="/logo-sowish.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B1F3A" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Sowish Viabilidade — Avalie a viabilidade do seu espaço clínico com base nas normas da vigilância sanitária." />
+    <title>Sowish Viabilidade</title>
+    <style>
+      /* Splash inicial: logo centralizada enquanto o app carrega (PWA / abertura no celular) */
+      #sowish-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        background: linear-gradient(160deg, #0B1F3A 0%, #0d2847 50%, #0B1F3A 100%);
+      }
+      #sowish-splash img {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+      }
+      #sowish-splash .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid rgba(255,255,255,0.2);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: sowish-spin 0.8s linear infinite;
+      }
+      @keyframes sowish-spin { to { transform: rotate(360deg); } }
+      #sowish-splash.loaded { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div id="sowish-splash" aria-hidden="true">
+      <img src="/logo-sowish.png" alt="Sowish" width="120" height="120" />
+      <div class="spinner"></div>
+    </div>
+    <div id="root"></div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        window.__sowishReady = function() {
+          var s = document.getElementById('sowish-splash');
+          if (s) s.classList.add('loaded');
+        };
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
