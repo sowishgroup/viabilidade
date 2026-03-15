@@ -28,6 +28,8 @@ RUN echo 'server { \
   root /usr/share/nginx/html; \
   index index.html; \
   location / { try_files $uri $uri/ /index.html; } \
+  location ~* \.(js|mjs)$ { add_header Content-Type "application/javascript"; } \
+  location = /manifest.json { add_header Content-Type "application/manifest+json"; } \
   location /health { return 200; add_header Content-Type text/plain; } \
 }' > /etc/nginx/conf.d/default.conf
 
