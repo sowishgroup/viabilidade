@@ -3,14 +3,14 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL ?? '').trim()
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim()
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env (na raiz do projeto). Reinicie o servidor (npm run dev) após alterar o .env.'
-  )
-}
+// Se as variáveis não estiverem definidas (ex.: build no EasyPanel sem env), usamos placeholders
+// para o app abrir; o AuthContext tratará o erro/timeout e mostrará a tela de login.
+const url = supabaseUrl || 'https://placeholder.supabase.co'
+const key = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'
+const isConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
 // Cliente com opções explícitas para sessão e auth em todas as requisições
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(url, key, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
@@ -18,7 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     storageKey: (() => {
     try {
-      return `sb-${new URL(supabaseUrl).hostname.replace(/\./g, '-')}-auth-token`
+      return `sb-${new URL(url).hostname.replace(/\./g, '-')}-auth-token`
     } catch {
       return 'sb-sowish-viabilidade-auth-token'
     }
@@ -37,3 +37,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     } : undefined,
   },
 })
+
+export const supabaseConfigured = isConfigured
