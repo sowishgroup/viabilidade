@@ -12,8 +12,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0B1F3A]" />
+      <div className="flex items-center justify-center min-h-[200px] bg-[#0f172a]/50 rounded-xl">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-white/20 border-t-white" />
+        <span className="sr-only">Carregando...</span>
       </div>
     )
   }

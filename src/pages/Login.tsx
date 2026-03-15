@@ -18,15 +18,16 @@ const Login = () => {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 py-12">
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 py-12 bg-[#0f172a]/95 rounded-2xl">
         <img
-          src="/logo-sowish.png"
+          src="./logo-sowish.png"
           alt="Sowish"
           className="w-28 h-28 object-contain animate-pulse"
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
         />
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-sm text-white/80">Carregando...</p>
+          <p className="text-sm text-white/90">Carregando...</p>
         </div>
       </div>
     )

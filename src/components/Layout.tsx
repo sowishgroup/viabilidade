@@ -274,7 +274,7 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
       )}
 
-      <main className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-10">
+      <main className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-10 bg-[#0f172a]/30 min-h-[60vh]">
         <div className="max-w-6xl mx-auto w-full px-3 sm:px-6 min-h-[60vh]">{children}</div>
       </main>
     </div>
