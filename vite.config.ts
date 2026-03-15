@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       : {}
 
   return {
+    base: '/', // Em produção o app deve ser servido na raiz do domínio (ex: viabilidade.sowishgroup.com). Se usar subpath, altere para ex: '/viabilidade/'
     plugins: [react()],
     server,
   }

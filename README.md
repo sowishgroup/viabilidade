@@ -1,4 +1,12 @@
-# React + TypeScript + Vite
+# Sowish Viabilidade
+
+App de viabilidade para clínicas (React + TypeScript + Vite + Supabase).
+
+**Deploy em produção:** veja [DEPLOY.md](./DEPLOY.md) — use o **Dockerfile** e sirva o **build** (`dist/`), não o código-fonte.
+
+---
+
+# React + TypeScript + Vite (template)
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

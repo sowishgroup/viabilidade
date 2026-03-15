@@ -70,6 +70,13 @@
         window.__sowishReady = hideSplash;
         document.addEventListener('DOMContentLoaded', function() {
           setTimeout(hideSplash, 4000);
+          setTimeout(function() {
+            var root = document.getElementById('root');
+            if (root && !root.hasChildNodes()) {
+              hideSplash();
+              root.innerHTML = '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;text-align:center"><p style="margin-bottom:16px">O app não carregou.</p><p style="font-size:14px;color:#94a3b8;margin-bottom:24px">Recarregue a página ou verifique se o deploy está usando o build (Docker) e não o código-fonte.</p><button onclick="location.reload()" style="padding:10px 20px;border-radius:9999px;background:#0B1F3A;color:white;border:none;cursor:pointer;font-size:14px">Recarregar</button></div>';
+            }
+          }, 6000);
         });
       })();
     </script>
