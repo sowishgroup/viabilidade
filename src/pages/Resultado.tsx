@@ -263,7 +263,7 @@ const Resultado = () => {
         {/* Cabeçalho do programa (sempre visível na tela; na impressão vira o topo do documento) */}
         <header className="hidden print:block print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4">
           <div className="flex items-center gap-3">
-            <img src="/logo-sowish.png" alt="" className="h-10 w-10 object-contain print:block" />
+            <img src={`${import.meta.env.BASE_URL}logo-sowish.png`} alt="" className="h-10 w-10 object-contain print:block" />
             <div>
               <span className="block text-xs tracking-[0.2em] uppercase text-slate-500 print:text-slate-600">
                 Sowish Viabilidade

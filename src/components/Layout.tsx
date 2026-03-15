@@ -50,7 +50,7 @@ const Layout = ({ children }: LayoutProps) => {
         <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-3 min-w-0">
             <img
-              src="/logo-sowish.png"
+              src={`${import.meta.env.BASE_URL}logo-sowish.png`}
               alt=""
               className="h-8 w-8 sm:h-9 sm:w-9 object-contain shrink-0 rounded-lg"
             />

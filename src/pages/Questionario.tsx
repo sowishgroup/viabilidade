@@ -114,7 +114,11 @@ const Questionario = () => {
       return
     }
     if (!webhookUrl) {
-      setError('Webhook n8n não configurado. Defina VITE_N8N_WEBHOOK_URL no .env e reinicie o servidor (npm run dev).')
+      setError(
+        import.meta.env.DEV
+          ? 'Webhook n8n não configurado. Defina VITE_N8N_WEBHOOK_URL no .env e reinicie o servidor (npm run dev).'
+          : 'Webhook n8n não configurado. No EasyPanel, adicione VITE_N8N_WEBHOOK_URL nas variáveis de ambiente do build e faça um novo deploy.'
+      )
       return
     }
 

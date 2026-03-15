@@ -20,7 +20,7 @@ const Login = () => {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 py-12 bg-[#0f172a]/95 rounded-2xl">
         <img
-          src="./logo-sowish.png"
+          src={`${import.meta.env.BASE_URL}logo-sowish.png`}
           alt="Sowish"
           className="w-28 h-28 object-contain animate-pulse"
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
@@ -76,7 +76,7 @@ const Login = () => {
           {/* Banner: mesma proporção visual do card */}
           <div className="relative w-full aspect-[4/2.2] min-h-[140px] bg-slate-800/60 flex-shrink-0">
             <img
-              src="/bg-desktop.png"
+              src={`${import.meta.env.BASE_URL}bg-desktop.png`}
               alt="Sowish Viabilidade — planejamento e viabilidade para saúde"
               className="absolute inset-0 w-full h-full object-cover opacity-90"
             />
@@ -120,7 +120,7 @@ const Login = () => {
           {/* Logo e nome no topo (mobile e desktop) */}
           <div className="flex flex-col items-center text-center mb-5">
             <img
-              src="/logo-sowish.png"
+              src={`${import.meta.env.BASE_URL}logo-sowish.png`}
               alt="Sowish Viabilidade"
               className="w-20 h-20 sm:w-24 sm:h-24 object-contain"
             />

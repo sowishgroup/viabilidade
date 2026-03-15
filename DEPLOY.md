@@ -21,11 +21,14 @@ Em **produção** o navegador deve receber o **build** (pasta `dist/`), onde o `
 3. **Variáveis de ambiente no build**  
    No EasyPanel, defina **no ambiente de build** (não só em runtime):
    - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`  
-   (e `VITE_N8N_WEBHOOK_URL` se usar n8n).  
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_N8N_WEBHOOK_URL` — **obrigatório para consultas**: URL do webhook do n8n que recebe o questionário e devolve o relatório. Sem isso, ao tentar fazer uma consulta o app exibe "Webhook n8n não configurado". Depois de adicionar, faça um **novo deploy** (o valor é embutido no build).  
    O Dockerfile usa `ARG`/`ENV` para que o Vite embuta esses valores no bundle.
 
-4. **Build da imagem**  
+4. **Imagens (logo e fundos)**  
+   Para o logo e as imagens de fundo aparecerem, coloque na pasta `public/`: `logo-sowish.png`, `bg-mobile.png`, `bg-desktop.png` (veja `public/IMAGENS-README.txt`). Se não colocar, o app funciona, mas os lugares das imagens ficarão vazios ou com fallback.
+
+5. **Build da imagem**  
    O EasyPanel deve **construir a imagem Docker** a partir deste repositório (e depois subir o container). Assim o servidor nunca entrega `/src/main.tsx`, só os arquivos gerados em `dist/`.
 
 ## Se a tela continuar azul
