@@ -257,25 +257,29 @@ const Resultado = () => {
           </p>
         </div>
       )}
-      {/* Cabeçalho de documento (apenas impressão) */}
-      <div className="hidden print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4 max-w-4xl mx-auto text-slate-900">
-        <div className="flex flex-col">
-          <span className="text-xs tracking-[0.2em] uppercase text-slate-500">
-            Sowish Viabilidade
-          </span>
-          <span className="text-lg font-semibold">
-            Laudo de Viabilidade Arquitetônica
-          </span>
-        </div>
-        <div className="text-right text-[11px] leading-snug">
-          <p>Data de geração: {new Date().toLocaleDateString('pt-BR')}</p>
-          {consultaId && (
-            <p className="font-mono text-slate-600">ID: {consultaId}</p>
-          )}
-        </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto space-y-6 print:space-y-4">
+      {/* Área que será impressa/PDF (cabeçalho + relatório + avisos) */}
+      <div className="print-document max-w-4xl mx-auto">
+        {/* Cabeçalho do programa (sempre visível na tela; na impressão vira o topo do documento) */}
+        <header className="hidden print:block print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4">
+          <div className="flex items-center gap-3">
+            <img src="/logo-sowish.png" alt="" className="h-10 w-10 object-contain print:block" />
+            <div>
+              <span className="block text-xs tracking-[0.2em] uppercase text-slate-500 print:text-slate-600">
+                Sowish Viabilidade
+              </span>
+              <span className="block text-lg font-semibold text-slate-900">
+                Laudo de Viabilidade Arquitetônica
+              </span>
+            </div>
+          </div>
+          <div className="text-right text-[11px] leading-snug text-slate-700">
+            <p>Data de geração: {new Date().toLocaleDateString('pt-BR')}</p>
+            {consultaId && <p className="font-mono text-slate-600">ID: {consultaId}</p>}
+          </div>
+        </header>
+
+        <div className="space-y-6 print:space-y-4">
         {/* Seção: título + status + resumo rápido */}
         <section className="bg-white/45 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6 sm:p-8 print:bg-white print:shadow-none print:border-none print:p-0">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -385,6 +389,9 @@ const Resultado = () => {
               in loco, o projeto arquitetônico detalhado ou a validação formal
               junto à vigilância sanitária e demais órgãos competentes.
             </p>
+            <p className="leading-relaxed text-justify font-semibold mt-3 print:mt-3">
+              Consulte um especialista antes de tomar qualquer decisão com base neste documento.
+            </p>
           </div>
         </section>
 
@@ -406,8 +413,11 @@ const Resultado = () => {
           </section>
         )}
 
-        {/* Barra de ações (tela apenas, após todo o conteúdo) */}
-        <div className="pt-2 pb-6 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center sm:justify-end print:hidden">
+        </div>
+      </div>
+
+        {/* Barra de ações (tela apenas, fora do documento impresso) */}
+        <div className="pt-2 pb-6 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center sm:justify-end print:hidden max-w-4xl mx-auto">
           <button
             type="button"
             onClick={() => window.print()}
@@ -435,6 +445,8 @@ const Resultado = () => {
                 resumo ? `Resumo do laudo: ${resumo}` : '',
                 '',
                 'Lembre-se: Este é um laudo preliminar gerado por Inteligência Artificial e não substitui o projeto de um arquiteto.',
+                '',
+                'Consulte um especialista antes de tomar qualquer decisão com base neste documento.',
               ]
                 .filter(Boolean)
                 .join('\n')
@@ -468,6 +480,8 @@ const Resultado = () => {
                 resumo || '(sem resumo disponível)',
                 '',
                 '⚠️ _Aviso: Este é um laudo preliminar gerado por IA (RDC 50) e não substitui avaliação técnica no local._',
+                '',
+                '_Consulte um especialista antes de tomar qualquer decisão com base neste documento._',
               ].join('\n')
 
               const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
@@ -478,7 +492,6 @@ const Resultado = () => {
             <span className="mr-2">💬</span> Enviar por WhatsApp
           </button>
         </div>
-      </div>
     </div>
   )
 }

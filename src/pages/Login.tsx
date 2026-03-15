@@ -45,7 +45,7 @@ const Login = () => {
       if (isSignUp) {
         const { error: err } = await signUp({ email, password })
         if (err) {
-          setError(err.message)
+          setError(err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : String(err))
           setSubmitting(false)
           return
         }
@@ -56,7 +56,7 @@ const Login = () => {
       } else {
         const { error: err } = await signIn({ email, password })
         if (err) {
-          setError(err.message)
+          setError(err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : String(err))
           setSubmitting(false)
           return
         }

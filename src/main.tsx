@@ -17,9 +17,8 @@ try {
   )
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      if (typeof (window as { __sowishReady?: () => void }).__sowishReady === 'function') {
-        (window as { __sowishReady: () => void }).__sowishReady()
-      }
+      const w = window as unknown as { __sowishReady?: () => void }
+      if (typeof w.__sowishReady === 'function') w.__sowishReady()
     })
   })
 } catch (err) {
