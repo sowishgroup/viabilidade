@@ -17,6 +17,9 @@ type AuthContextValue = {
   user: User | null
   profile: Profile | null
   loading: boolean
+  /** Erro de conexão ou autenticação com o Supabase (rede, URL, RLS, sessão inválida). */
+  supabaseError: string | null
+  dismissSupabaseError: () => void
   signIn: (creds: SignInCredentials) => Promise<{ data: unknown; error: unknown }>
   signUp: (creds: SignUpCredentials) => Promise<{ data: unknown; error: unknown }>
   signOut: () => Promise<void>
@@ -40,12 +43,21 @@ function defaultProfile(userId: string): Profile {
   return { id: userId, credits: 3, role: 'user' } as Profile
 }
 
+function isAuthError(err: { message?: string; code?: string } | null): boolean {
+  if (!err) return false
+  const msg = (err.message ?? '').toLowerCase()
+  const code = err.code ?? ''
+  return msg.includes('jwt') || msg.includes('session') || msg.includes('expired') || code === 'PGRST301' || code === '401'
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [supabaseError, setSupabaseError] = useState<string | null>(null)
 
   const fetchProfile = useCallback(async (userId: string) => {
+    setSupabaseError(null)
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -53,12 +65,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single()
 
     if (error) {
+      if (isAuthError(error)) {
+        setSupabaseError('Sessão expirada ou inválida. Faça login novamente.')
+        await supabase.auth.signOut()
+        setUser(null)
+        setProfile(null)
+        return
+      }
+      setSupabaseError(error.message || 'Erro ao carregar perfil (Supabase). Verifique .env e o script SQL no projeto.')
       await ensureProfile(userId)
-      const { data: retryData } = await supabase
+      const { data: retryData, error: retryErr } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
+      if (retryErr) {
+        setSupabaseError(retryErr.message || 'Perfil não encontrado. Rode supabase/RODE-ISSO-NO-SUPABASE.sql no SQL Editor.')
+      } else {
+        setSupabaseError(null)
+      }
       if (retryData) {
         setProfile(retryData as Profile)
       } else {
@@ -83,10 +108,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const getSession = async () => {
       try {
+        setSupabaseError(null)
         const {
           data: { session },
+          error: sessionError,
         } = await supabase.auth.getSession()
         if (cancelled) return
+        if (sessionError) {
+          setSupabaseError(sessionError.message || 'Erro ao obter sessão. Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env.')
+          setUser(null)
+          setProfile(null)
+          setLoading(false)
+          return
+        }
         const u = session?.user ?? null
         setUser(u)
         if (u) {
@@ -95,8 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(null)
         }
       } catch (err) {
-        console.error('Erro ao obter sessão:', err)
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error('Erro ao obter sessão Supabase:', err)
         if (!cancelled) {
+          setSupabaseError(msg || 'Não foi possível conectar ao Supabase. Verifique .env e se o projeto está ativo no dashboard.')
           setUser(null)
           setProfile(null)
         }
@@ -179,6 +215,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     profile,
     loading,
+    supabaseError,
+    dismissSupabaseError: () => setSupabaseError(null),
     signIn,
     signUp,
     signOut,

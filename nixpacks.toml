@@ -1,0 +1,4 @@
+# Node 20: use .nvmrc ou engines.node no package.json (já configurados).
+# Install: npm install em vez de npm ci, para não falhar se o lock file estiver ausente/desatualizado.
+[phases.install]
+cmds = ["npm install"]

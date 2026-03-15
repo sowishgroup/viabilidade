@@ -119,26 +119,35 @@ const Perfil = () => {
         .single()
     }
 
-    const timeoutMs = 45000
-    const withTimeout = <T,>(p: Promise<T>) =>
-      Promise.race([
-        p,
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error(
-                  'Tempo esgotado. Verifique sua internet, se o projeto Supabase está ativo (Dashboard) e se a coluna cpf_cnpj existe na tabela profiles (rode a migration no SQL Editor).'
-                )
-              ),
-            timeoutMs
-          )
-        ),
-      ])
+    const isRetryableError = (msg: string) =>
+      msg.includes('Lock broken') ||
+      msg.includes('AbortError') ||
+      msg.includes('aborted') ||
+      msg.includes('steal')
 
     try {
-      const result = await withTimeout(doUpdate(true))
-      const updateError = result.error
+      let result = await doUpdate(true)
+      let updateError = result.error
+
+      // Se falhou por cpf_cnpj/coluna, tenta sem CPF/CNPJ
+      if (updateError && (String(updateError.message ?? '').includes('cpf_cnpj') || String(updateError.message ?? '').includes('column'))) {
+        result = await doUpdate(false)
+        updateError = result.error
+        if (!updateError) {
+          setSuccess('Nome, telefone e especialidade salvos. Para salvar CPF/CNPJ, rode no Supabase a migration que adiciona a coluna cpf_cnpj na tabela profiles.')
+          refreshProfile().catch(() => {})
+          setSavingProfile(false)
+          return
+        }
+      }
+
+      // Se falhou por lock/abort (outra aba ou conflito de armazenamento), tenta uma vez de novo
+      if (updateError && isRetryableError(String(updateError.message ?? ''))) {
+        await new Promise((r) => setTimeout(r, 500))
+        result = await doUpdate(true)
+        updateError = result.error
+      }
+
       if (updateError) {
         const err = updateError as { message?: string; details?: string; hint?: string }
         const msg = err?.message ?? String(updateError)
@@ -153,18 +162,8 @@ const Perfil = () => {
         err && typeof err === 'object' && 'message' in err && typeof (err as { message: string }).message === 'string'
           ? (err as { message: string }).message
           : String(err)
-      if (msg.includes('Tempo esgotado') || msg.includes('cpf_cnpj') || msg.includes('column')) {
-        try {
-          const retry = await withTimeout(doUpdate(false))
-          if (!retry.error) {
-            setSuccess('Nome, telefone e especialidade salvos. Para salvar CPF/CNPJ, execute no Supabase a migration que adiciona a coluna cpf_cnpj na tabela profiles.')
-            refreshProfile().catch(() => {})
-            setSavingProfile(false)
-            return
-          }
-        } catch {
-          setError('Perfil: ' + msg)
-        }
+      if (isRetryableError(msg)) {
+        setError('Perfil: Houve um conflito temporário (outra aba ou navegador). Clique em "Salvar" novamente.')
       } else {
         setError('Perfil: ' + msg)
       }

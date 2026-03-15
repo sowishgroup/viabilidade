@@ -173,7 +173,33 @@ const Questionario = () => {
 
       const data = normalizeN8nResponse(raw)
 
-      const { data: consulta, error: insertError } = await supabase
+      // ID temporário para exibir o resultado; será trocado pelo ID real se o insert funcionar
+      const tempId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `temp-${Date.now()}`
+      const consultaParaResultado = {
+        id: tempId,
+        user_id: user.id,
+        area_total: data.areaRecomendada,
+        relatorio: data.relatório ?? null,
+        imagem_url: data.imagemUrl ?? null,
+        instalacoes_tecnicas: data.instalacoesTecnicas ?? null,
+        especialidade: form.especialidade || null,
+        num_salas: Number(form.numeroSalas) || null,
+        equipe_admin: Number(form.funcionariosTurno) || null,
+        markdown: null,
+        tem_anestesia: null,
+        created_at: new Date().toISOString(),
+      }
+
+      // Salvar no sessionStorage ANTES do insert — assim a página Resultado sempre tem o que exibir
+      try {
+        sessionStorage.setItem(`sowish_consulta_${tempId}`, JSON.stringify(consultaParaResultado))
+        sessionStorage.setItem('sowish_consulta_latest', JSON.stringify(consultaParaResultado))
+      } catch (_) {}
+
+      let consultaId = tempId
+      let savedToServer = false
+
+      const insertResult = await supabase
         .from('consultas')
         .insert({
           user_id: user.id,
@@ -188,43 +214,30 @@ const Questionario = () => {
         .select('id')
         .single()
 
-      if (insertError) throw insertError
-
-      // ID do insert ou temporário se o RETURNING não vier (ex.: RLS) — assim o resultado sempre pode ser exibido via sessionStorage
-      const consultaId =
-        consulta?.id ??
-        (consulta as { id?: string } | undefined)?.id ??
-        (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `temp-${Date.now()}`)
-
-      const consultaParaResultado = {
-        id: consultaId,
-        user_id: user.id,
-        area_total: data.areaRecomendada,
-        relatorio: data.relatório ?? null,
-        imagem_url: data.imagemUrl ?? null,
-        instalacoes_tecnicas: data.instalacoesTecnicas ?? null,
-        especialidade: form.especialidade || null,
-        num_salas: Number(form.numeroSalas) || null,
-        equipe_admin: Number(form.funcionariosTurno) || null,
-        markdown: null,
-        tem_anestesia: null,
-        created_at: new Date().toISOString(),
+      if (insertResult.error) {
+        console.warn('Consulta não salva no Supabase:', insertResult.error)
+        navigate(`/resultado/${consultaId}`, { replace: true, state: { onlyLocal: true } })
+        return
       }
 
-      // Sempre salvar no sessionStorage (por ID e como "latest") para a página Resultado exibir
-      try {
-        sessionStorage.setItem(`sowish_consulta_${consultaId}`, JSON.stringify(consultaParaResultado))
-        sessionStorage.setItem('sowish_consulta_latest', JSON.stringify(consultaParaResultado))
-      } catch (_) {}
-
-      if (!consulta?.id && !(consulta as { id?: string })?.id) {
-        console.warn('Insert não retornou ID; resultado exibido via sessionStorage.')
+      const consulta = insertResult.data
+      if (consulta?.id ?? (consulta as { id?: string })?.id) {
+        consultaId = (consulta?.id ?? (consulta as { id?: string }).id) as string
+        savedToServer = true
+        const atualizado = { ...consultaParaResultado, id: consultaId }
+        try {
+          sessionStorage.setItem(`sowish_consulta_${consultaId}`, JSON.stringify(atualizado))
+          sessionStorage.setItem('sowish_consulta_latest', JSON.stringify(atualizado))
+        } catch (_) {}
       }
 
-      await supabase
-        .from('profiles')
-        .update({ credits: Math.max(0, profile.credits - 1) })
-        .eq('id', user.id)
+      if (savedToServer) {
+        await supabase
+          .from('profiles')
+          .update({ credits: Math.max(0, profile.credits - 1) })
+          .eq('id', user.id)
+        refreshProfile().catch(() => {})
+      }
 
       navigate(`/resultado/${consultaId}`, { replace: true })
     } catch (err) {

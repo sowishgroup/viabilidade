@@ -25,7 +25,7 @@ const getInitials = (name: string) => {
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, signOut, supabaseError, dismissSupabaseError } = useAuth()
   const [logoutLoading, setLogoutLoading] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [drawerVisible, setDrawerVisible] = useState(false)
@@ -250,6 +250,28 @@ const Layout = ({ children }: LayoutProps) => {
             )}
           </aside>
         </>
+      )}
+
+      {supabaseError && (
+        <div className="sticky top-16 z-10 max-w-6xl mx-auto w-full px-3 sm:px-6 pt-2">
+          <div className="rounded-xl bg-amber-500/95 text-[#0B1F3A] px-4 py-3 flex items-start gap-3 shadow-lg border border-amber-400/50">
+            <p className="flex-1 text-sm font-medium">
+              <strong>Supabase:</strong> {supabaseError}
+              <span className="block mt-1 text-xs opacity-90">
+                Confira o .env (VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY) e rode{' '}
+                <code className="bg-black/20 px-1 rounded">supabase/RODE-ISSO-NO-SUPABASE.sql</code> no SQL Editor do projeto.
+              </span>
+            </p>
+            <button
+              type="button"
+              onClick={dismissSupabaseError}
+              className="shrink-0 p-1.5 rounded-lg hover:bg-black/10 transition"
+              aria-label="Fechar aviso"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
       )}
 
       <main className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-10">

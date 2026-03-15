@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { supabase } from '../lib/supabaseClient'
 import type { Consulta } from '../types/consulta'
@@ -23,6 +23,8 @@ const getResumoLaudo = (consulta: Consulta | null) => {
 const Resultado = () => {
   const { consultaId } = useParams<{ consultaId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
+  const onlyLocal = (location.state as { onlyLocal?: boolean } | null)?.onlyLocal === true
   const [consulta, setConsulta] = useState<Consulta | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -247,6 +249,14 @@ const Resultado = () => {
 
   return (
     <div className="space-y-4 print:space-y-0">
+      {onlyLocal && (
+        <div className="rounded-xl bg-amber-500/95 text-[#0B1F3A] px-4 py-3 max-w-4xl mx-auto border border-amber-400/50 shadow-lg print:hidden">
+          <p className="text-sm font-medium">
+            Este resultado não foi salvo no Supabase (o insert falhou). Seu crédito não foi descontado.
+            Rode o script <code className="bg-black/20 px-1 rounded">supabase/RODE-ISSO-NO-SUPABASE.sql</code> no SQL Editor do projeto e tente novamente.
+          </p>
+        </div>
+      )}
       {/* Cabeçalho de documento (apenas impressão) */}
       <div className="hidden print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4 max-w-4xl mx-auto text-slate-900">
         <div className="flex flex-col">
