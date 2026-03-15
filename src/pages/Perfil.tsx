@@ -143,12 +143,12 @@ const Perfil = () => {
         ),
       ])
       let result = await updateWithTimeout
-      let updateError = result.error
+      let updateError = result.error as { message?: string } | null
 
       // Se falhou por cpf_cnpj/coluna, tenta sem CPF/CNPJ
       if (updateError && (String(updateError.message ?? '').includes('cpf_cnpj') || String(updateError.message ?? '').includes('column'))) {
         result = await doUpdate(false)
-        updateError = result.error
+        updateError = result.error as { message?: string } | null
         if (!updateError) {
           setSuccess('Nome, telefone e especialidade salvos. Para salvar CPF/CNPJ, rode no Supabase a migration que adiciona a coluna cpf_cnpj na tabela profiles.')
           refreshProfile().catch(() => {})
@@ -161,7 +161,7 @@ const Perfil = () => {
       if (updateError && isRetryableError(String(updateError.message ?? ''))) {
         await new Promise((r) => setTimeout(r, 500))
         result = await doUpdate(true)
-        updateError = result.error
+        updateError = result.error as { message?: string } | null
       }
 
       if (updateError) {

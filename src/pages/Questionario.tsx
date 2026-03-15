@@ -100,7 +100,7 @@ const Questionario = () => {
   // Build (VITE_*) ou runtime (window.__SOWISH_N8N_WEBHOOK_URL__ no index.html) – fallback para quando a variável some no EasyPanel
   const webhookUrl = (
     (import.meta.env.VITE_N8N_WEBHOOK_URL ?? '') ||
-    (typeof window !== 'undefined' && (window as unknown as { __SOWISH_N8N_WEBHOOK_URL__?: string }).__SOWISH_N8N_WEBHOOK_URL__ ?? '')
+    (typeof window !== 'undefined' ? ((window as unknown as { __SOWISH_N8N_WEBHOOK_URL__?: string }).__SOWISH_N8N_WEBHOOK_URL__ ?? '') : '')
   ).trim()
 
   const handleSubmit = async (e?: React.FormEvent) => {
