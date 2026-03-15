@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { supabase } from '../lib/supabaseClient'
+import { supabase, supabaseConfigured } from '../lib/supabaseClient'
 
 const Perfil = () => {
   const navigate = useNavigate()
@@ -40,6 +40,10 @@ const Perfil = () => {
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file || !user) return
+    if (!supabaseConfigured) {
+      setError('Supabase não configurado. Configure as variáveis no EasyPanel e faça um novo deploy.')
+      return
+    }
 
     setUploading(true)
     setError(null)
@@ -92,6 +96,10 @@ const Perfil = () => {
 
   const handleSaveProfile = async () => {
     if (!user) return
+    if (!supabaseConfigured) {
+      setError('Supabase não configurado. Configure as variáveis no EasyPanel e faça um novo deploy.')
+      return
+    }
     if (!fullName.trim()) {
       setError('Nome completo é obrigatório.')
       return
@@ -100,6 +108,8 @@ const Perfil = () => {
     setSavingProfile(true)
     setError(null)
     setSuccess(null)
+
+    const PROFILE_UPDATE_TIMEOUT_MS = 20000
 
     const doUpdate = (includeCpfCnpj: boolean) => {
       const cpfCnpjOnly = cpfCnpj.replace(/\D/g, '')
@@ -126,7 +136,13 @@ const Perfil = () => {
       msg.includes('steal')
 
     try {
-      let result = await doUpdate(true)
+      const updateWithTimeout = Promise.race([
+        doUpdate(true).then((r) => r),
+        new Promise<{ error: unknown }>((_, reject) =>
+          setTimeout(() => reject(new Error('Tempo esgotado. Verifique sua conexão e tente novamente.')), PROFILE_UPDATE_TIMEOUT_MS)
+        ),
+      ])
+      let result = await updateWithTimeout
       let updateError = result.error
 
       // Se falhou por cpf_cnpj/coluna, tenta sem CPF/CNPJ

@@ -12,6 +12,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="Sowish Viabilidade — Avalie a viabilidade do seu espaço clínico com base nas normas da vigilância sanitária." />
     <title>Sowish Viabilidade</title>
+    <!-- URL do webhook n8n: se a variável VITE_N8N_WEBHOOK_URL sempre sumir no EasyPanel, coloque a URL aqui entre aspas (ex.: "https://n8n-n8n.84bvnc.easypanel.host/webhook/consulta-viabilidade") -->
+    <script>window.__SOWISH_N8N_WEBHOOK_URL__ = "https://n8n-n8n.84bvnc.easypanel.host/webhook/consulta-viabilidade";</script>
     <style>
       /* Splash inicial: logo centralizada enquanto o app carrega (PWA / abertura no celular) */
       #sowish-splash {
@@ -69,6 +71,9 @@
         }
         window.__sowishReady = hideSplash;
         document.addEventListener('DOMContentLoaded', function() {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').catch(function() {})
+          }
           setTimeout(hideSplash, 4000);
           setTimeout(function() {
             var root = document.getElementById('root');

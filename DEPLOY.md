@@ -22,8 +22,13 @@ Em **produção** o navegador deve receber o **build** (pasta `dist/`), onde o `
    No EasyPanel, defina **no ambiente de build** (não só em runtime):
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_N8N_WEBHOOK_URL` — **obrigatório para consultas**: URL do webhook do n8n que recebe o questionário e devolve o relatório. Sem isso, ao tentar fazer uma consulta o app exibe "Webhook n8n não configurado". Depois de adicionar, faça um **novo deploy** (o valor é embutido no build).  
+   - `VITE_N8N_WEBHOOK_URL` — **obrigatório para consultas**: URL do webhook do n8n (ex.: `https://n8n-n8n.84bvnc.easypanel.host/webhook/consulta-viabilidade`). Depois de adicionar, faça um **novo deploy** (o valor é embutido no build).  
    O Dockerfile usa `ARG`/`ENV` para que o Vite embuta esses valores no bundle.
+
+   **Por que a variável do webhook “some” no EasyPanel?**  
+   Em alguns painéis a variável é tratada só como “runtime” ou o campo limpa ao salvar. Duas saídas:
+   - **Opção A:** Use a seção **Build** / **Build Arguments** (não só “Environment”) e coloque o nome exato `VITE_N8N_WEBHOOK_URL` e o valor sem aspas, sem barra no final.
+   - **Opção B:** Defina a URL direto no **`index.html`**: existe a linha `window.__SOWISH_N8N_WEBHOOK_URL__ = "..."`. Coloque a URL do webhook entre as aspas, faça commit e deploy. O app usa essa URL em tempo de execução e não depende da variável de ambiente.
 
 4. **Imagens (logo e fundos)**  
    Para o logo e as imagens de fundo aparecerem, coloque na pasta `public/`: `logo-sowish.png`, `bg-mobile.png`, `bg-desktop.png` (veja `public/IMAGENS-README.txt`). Se não colocar, o app funciona, mas os lugares das imagens ficarão vazios ou com fallback.

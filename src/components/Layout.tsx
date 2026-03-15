@@ -38,6 +38,24 @@ const Layout = ({ children }: LayoutProps) => {
     setDrawerVisible(false)
   }, [drawerOpen])
 
+  // Plano de fundo com BASE_URL para funcionar em produção (CSS estático usa /)
+  useEffect(() => {
+    const base = import.meta.env.BASE_URL
+    const mobile = `${base}bg-mobile.png`
+    const desktop = `${base}bg-desktop.png`
+    const gradient = 'linear-gradient(to bottom, rgba(15, 23, 42, 0.42) 0%, rgba(15, 23, 42, 0.28) 100%)'
+    const setBg = () => {
+      document.body.style.backgroundImage =
+        window.matchMedia('(min-width: 1024px)').matches
+          ? `${gradient}, url("${desktop}")`
+          : `${gradient}, url("${mobile}")`
+    }
+    setBg()
+    const mq = window.matchMedia('(min-width: 1024px)')
+    mq.addEventListener('change', setBg)
+    return () => mq.removeEventListener('change', setBg)
+  }, [])
+
   const displayName =
     (profile?.full_name?.trim() && profile.full_name.trim()) ||
     profile?.email ||
