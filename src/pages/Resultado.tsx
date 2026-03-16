@@ -4,22 +4,6 @@ import ReactMarkdown from 'react-markdown'
 import { supabase } from '../lib/supabaseClient'
 import type { Consulta } from '../types/consulta'
 
-const getStatusText = (tone: 'success' | 'alert' | 'neutral') => {
-  if (tone === 'success') return 'Viável'
-  if (tone === 'alert') return 'Não atende às normas'
-  return 'Em análise'
-}
-
-const getResumoLaudo = (consulta: Consulta | null) => {
-  if (!consulta) return ''
-  const fonte = consulta.relatorio ?? consulta.instalacoes_tecnicas ?? ''
-  if (!fonte) return ''
-  const clean = fonte.replace(/\s+/g, ' ').trim()
-  const partes = clean.split('. ')
-  if (partes.length <= 2) return clean
-  return partes.slice(0, 2).join('. ') + '.'
-}
-
 const Resultado = () => {
   const { consultaId } = useParams<{ consultaId: string }>()
   const navigate = useNavigate()
