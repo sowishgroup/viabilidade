@@ -242,7 +242,7 @@ const Resultado = () => {
         </div>
       )}
 
-      {/* Área que será impressa/PDF (cabeçalho + relatório + avisos) */}
+      {/* Área que será impressa/PDF (layout visual atual) */}
       <div className="print-document max-w-4xl mx-auto">
         {/* Cabeçalho do programa (tela e impressão; na impressão mantém apenas a logo e textos) */}
         <header className="hidden print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4">
@@ -383,6 +383,45 @@ const Resultado = () => {
         </section>
 
         </div>
+      </div>
+
+      {/* Versão simplificada apenas para impressão – garante que o laudo sempre apareça no PDF */}
+      <div className="hidden print:block max-w-4xl mx-auto mt-4 text-[11px] text-slate-900">
+        <h1 className="text-base font-semibold mb-1">Laudo de Viabilidade Arquitetônica</h1>
+        {consulta.area_total != null && (
+          <p className="mb-0.5">
+            <strong>Área recomendada:</strong> {consulta.area_total} m²
+          </p>
+        )}
+        {consulta.especialidade && (
+          <p className="mb-2">
+            <strong>Especialidade avaliada:</strong> {consulta.especialidade}
+          </p>
+        )}
+        {statusLabel && (
+          <p className="mb-2">
+            <strong>Status:</strong> {statusLabel}
+            {statusDescription && <> – {statusDescription}</>}
+          </p>
+        )}
+
+        {consulta.relatorio && (
+          <section className="mt-3">
+            <h2 className="text-sm font-semibold mb-1">Relatório técnico</h2>
+            <div className="leading-relaxed text-justify">
+              <ReactMarkdown>{consulta.relatorio}</ReactMarkdown>
+            </div>
+          </section>
+        )}
+
+        {consulta.instalacoes_tecnicas && (
+          <section className="mt-3">
+            <h2 className="text-sm font-semibold mb-1">Instalações técnicas e pontos de atenção</h2>
+            <div className="leading-relaxed text-justify">
+              <ReactMarkdown>{consulta.instalacoes_tecnicas}</ReactMarkdown>
+            </div>
+          </section>
+        )}
       </div>
 
         {/* Barra de ações (tela apenas, fora do documento impresso) */}
