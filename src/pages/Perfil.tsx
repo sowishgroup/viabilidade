@@ -109,7 +109,7 @@ const Perfil = () => {
     setError(null)
     setSuccess(null)
 
-    const PROFILE_UPDATE_TIMEOUT_MS = 20000
+    const PROFILE_UPDATE_TIMEOUT_MS = 45000
 
     const doUpdate = (includeCpfCnpj: boolean) => {
       const cpfCnpjOnly = cpfCnpj.replace(/\D/g, '')
@@ -133,16 +133,35 @@ const Perfil = () => {
       msg.includes('Lock broken') ||
       msg.includes('AbortError') ||
       msg.includes('aborted') ||
-      msg.includes('steal')
+      msg.includes('steal') ||
+      msg.includes('Tempo esgotado')
 
     try {
-      const updateWithTimeout = Promise.race([
-        doUpdate(true).then((r) => r),
-        new Promise<{ error: unknown }>((_, reject) =>
-          setTimeout(() => reject(new Error('Tempo esgotado. Verifique sua conexão e tente novamente.')), PROFILE_UPDATE_TIMEOUT_MS)
-        ),
-      ])
-      let result = await updateWithTimeout
+      let result: Awaited<ReturnType<typeof doUpdate>>
+      try {
+        result = await Promise.race([
+          doUpdate(true).then((r) => r),
+          new Promise<Awaited<ReturnType<typeof doUpdate>>>((_, reject) =>
+            setTimeout(() => reject(new Error('Tempo esgotado. Verifique sua conexão e tente novamente.')), PROFILE_UPDATE_TIMEOUT_MS)
+          ),
+        ])
+      } catch (timeoutErr) {
+        const isTimeout = String(timeoutErr instanceof Error ? timeoutErr.message : timeoutErr).includes('Tempo esgotado')
+        if (isTimeout) {
+          try {
+            result = await Promise.race([
+              doUpdate(true),
+              new Promise<Awaited<ReturnType<typeof doUpdate>>>((_, reject) =>
+                setTimeout(() => reject(new Error('Tempo esgotado. Verifique sua conexão e tente novamente.')), 60000)
+              ),
+            ])
+          } catch (retryErr) {
+            throw retryErr
+          }
+        } else {
+          throw timeoutErr
+        }
+      }
       let updateError = result.error as { message?: string } | null
 
       // Se falhou por cpf_cnpj/coluna, tenta sem CPF/CNPJ

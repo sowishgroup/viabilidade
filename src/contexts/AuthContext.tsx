@@ -129,7 +129,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return
         if (sessionError) {
           const diag = await testSupabaseConnection()
-          setSupabaseError(`Sessão: ${sessionError.message || 'erro ao obter sessão'}. Diagnóstico: ${diag}`)
+          if (!diag.includes('REST OK')) {
+            setSupabaseError(`Sessão: ${sessionError.message || 'erro ao obter sessão'}. Diagnóstico: ${diag}`)
+          }
           setUser(null)
           setProfile(null)
           setLoading(false)
@@ -154,14 +156,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const msg = err instanceof Error ? err.message : String(err)
         if (msg === 'timeout' && !cancelled) {
           const diag = await testSupabaseConnection()
-          setSupabaseError(`Conexão com o Supabase demorou. Diagnóstico: ${diag}`)
+          if (!diag.includes('REST OK')) {
+            setSupabaseError(`Conexão com o Supabase demorou. Diagnóstico: ${diag}`)
+          }
           setUser(null)
           setProfile(null)
         } else if (msg !== 'timeout') {
           console.error('Erro ao obter sessão Supabase:', err)
           if (!cancelled) {
             const diag = await testSupabaseConnection()
-            setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
+            if (!diag.includes('REST OK')) {
+              setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
+            }
             setUser(null)
             setProfile(null)
           }
