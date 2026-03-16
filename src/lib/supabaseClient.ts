@@ -1,10 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL ?? '').trim()
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim()
+type WindowSupabase = { __SOWISH_SUPABASE_URL__?: string; __SOWISH_SUPABASE_ANON_KEY__?: string }
 
-// Se as variáveis não estiverem definidas (ex.: build no EasyPanel sem env), usamos placeholders
-// para o app abrir; o AuthContext tratará o erro/timeout e mostrará a tela de login.
+const envUrl = (import.meta.env.VITE_SUPABASE_URL ?? '').trim()
+const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim()
+const runtimeUrl = (typeof window !== 'undefined' && (window as unknown as WindowSupabase).__SOWISH_SUPABASE_URL__) ? String((window as unknown as WindowSupabase).__SOWISH_SUPABASE_URL__).trim() : ''
+const runtimeKey = (typeof window !== 'undefined' && (window as unknown as WindowSupabase).__SOWISH_SUPABASE_ANON_KEY__) ? String((window as unknown as WindowSupabase).__SOWISH_SUPABASE_ANON_KEY__).trim() : ''
+
+const supabaseUrl = envUrl || runtimeUrl
+const supabaseAnonKey = envKey || runtimeKey
+
 const url = supabaseUrl || 'https://placeholder.supabase.co'
 const key = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'
 const isConfigured = Boolean(supabaseUrl && supabaseAnonKey)

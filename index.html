@@ -12,8 +12,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="Sowish Viabilidade — Avalie a viabilidade do seu espaço clínico com base nas normas da vigilância sanitária." />
     <title>Sowish Viabilidade</title>
-    <!-- URL do webhook n8n: se a variável VITE_N8N_WEBHOOK_URL sempre sumir no EasyPanel, coloque a URL aqui entre aspas (ex.: "https://n8n-n8n.84bvnc.easypanel.host/webhook/consulta-viabilidade") -->
+    <!-- Webhook n8n -->
     <script>window.__SOWISH_N8N_WEBHOOK_URL__ = "https://n8n-n8n.84bvnc.easypanel.host/webhook/consulta-viabilidade";</script>
+    <!-- Supabase: se a comunicação falhar (variáveis de build vazias/erradas), o app usa estes valores em tempo de execução -->
+    <script>
+      window.__SOWISH_SUPABASE_URL__ = "https://amzutfiaekmalxowimun.supabase.co";
+      window.__SOWISH_SUPABASE_ANON_KEY__ = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtenV0ZmlhZWttYWx4b3dpbXVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0ODgzMzQsImV4cCI6MjA4ODA2NDMzNH0.u__vXcF6w7MmUKS4N_RNVaD4oDxUr7BNudjlV2LcPOk";
+    </script>
     <style>
       /* Splash inicial: logo centralizada enquanto o app carrega (PWA / abertura no celular) */
       #sowish-splash {
@@ -65,15 +70,15 @@
     <div id="root"></div>
     <script>
       (function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js', { scope: '/' }).catch(function() {})
+        }
         function hideSplash() {
           var s = document.getElementById('sowish-splash');
           if (s) s.classList.add('loaded');
         }
         window.__sowishReady = hideSplash;
         document.addEventListener('DOMContentLoaded', function() {
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').catch(function() {})
-          }
           setTimeout(hideSplash, 4000);
           setTimeout(function() {
             var root = document.getElementById('root');

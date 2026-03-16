@@ -25,6 +25,8 @@ Em **produção** o navegador deve receber o **build** (pasta `dist/`), onde o `
    - `VITE_N8N_WEBHOOK_URL` — **obrigatório para consultas**: URL do webhook do n8n (ex.: `https://n8n-n8n.84bvnc.easypanel.host/webhook/consulta-viabilidade`). Depois de adicionar, faça um **novo deploy** (o valor é embutido no build).  
    O Dockerfile usa `ARG`/`ENV` para que o Vite embuta esses valores no bundle.
 
+   **Supabase:** O app usa as credenciais definidas no `index.html` (fallback em tempo de execução) se as variáveis de build estiverem vazias. No **Supabase Dashboard** → **Authentication** → **URL Configuration**, adicione em **Redirect URLs** a URL do app (ex.: `https://viabilidade.sowishgroup.com/**`) e em **Site URL** a mesma base, para login e sessão funcionarem.
+
    **Por que a variável do webhook “some” no EasyPanel?**  
    Em alguns painéis a variável é tratada só como “runtime” ou o campo limpa ao salvar. Duas saídas:
    - **Opção A:** Use a seção **Build** / **Build Arguments** (não só “Environment”) e coloque o nome exato `VITE_N8N_WEBHOOK_URL` e o valor sem aspas, sem barra no final.

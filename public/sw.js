@@ -1,5 +1,12 @@
-/* Service worker mínimo para PWA – permite instalação no celular */
-self.addEventListener('install', () => self.skipWaiting())
+/* Service worker para PWA instalável – controla a página e start_url */
+self.addEventListener('install', (e) => {
+  self.skipWaiting()
+})
+
 self.addEventListener('activate', (e) => {
   e.waitUntil(self.clients.claim())
+})
+
+self.addEventListener('fetch', (e) => {
+  e.respondWith(fetch(e.request))
 })

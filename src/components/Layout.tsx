@@ -62,8 +62,22 @@ const Layout = ({ children }: LayoutProps) => {
     user?.email ||
     'Usuário'
 
+  const baseUrl = import.meta.env.BASE_URL
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Camada de fundo com imagem (BASE_URL) – mobile e desktop */}
+      <div
+        aria-hidden
+        className="fixed inset-0 z-0 bg-[#0f172a] bg-cover bg-center bg-no-repeat lg:hidden"
+        style={{ backgroundImage: `url("${baseUrl}bg-mobile.png")` }}
+      />
+      <div
+        aria-hidden
+        className="fixed inset-0 z-0 bg-[#0f172a] bg-cover bg-center bg-no-repeat hidden lg:block"
+        style={{ backgroundImage: `url("${baseUrl}bg-desktop.png")` }}
+      />
+      <div className="fixed inset-0 z-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/30 pointer-events-none" aria-hidden />
       <header className="fixed top-0 left-0 right-0 z-20 backdrop-blur-xl bg-[#0B1F3A]/60 border-b border-white/10 print:hidden">
         <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-3 min-w-0">
@@ -292,7 +306,7 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
       )}
 
-      <main className="flex-1 pt-16 sm:pt-20 pb-8 sm:pb-10 bg-[#0f172a]/30 min-h-[60vh]">
+      <main className="relative z-10 flex-1 pt-16 sm:pt-20 pb-8 sm:pb-10 bg-transparent min-h-[60vh]">
         <div className="max-w-6xl mx-auto w-full px-3 sm:px-6 min-h-[60vh]">{children}</div>
       </main>
     </div>

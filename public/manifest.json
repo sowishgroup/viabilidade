@@ -1,25 +1,32 @@
 {
+  "id": "/",
   "name": "Sowish Viabilidade",
   "short_name": "Sowish Viabilidade",
   "description": "Viabilidade arquitetônica para clínicas e consultórios",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0B1F3A",
   "theme_color": "#0B1F3A",
   "orientation": "any",
   "icons": [
     {
-      "src": "logo-sowish.png",
+      "src": "/logo-sowish.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "logo-sowish.png",
+      "src": "/logo-sowish.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-sowish.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
