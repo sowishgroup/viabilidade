@@ -36,7 +36,7 @@ body {
   }
 }
 
-/* Impressão / PDF: apenas o conteúdo do relatório, fundo branco, texto colorido/visível */
+/* Impressão / PDF: apenas o conteúdo do relatório, fundo branco, texto sempre visível e escuro */
 @media print {
   body {
     background: #fff !important;
@@ -49,30 +49,40 @@ body {
   }
   .print-document,
   .print-document * {
-    visibility: visible;
+    visibility: visible !important;
   }
   .print-document {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    background: #fff;
-    padding: 0;
-    color: #1e293b;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    background: #fff !important;
+    padding: 0 !important;
+    color: #1e293b !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
-  .print-document p,
-  .print-document li,
-  .print-document span,
-  .print-document h1,
-  .print-document h2,
-  .print-document h3,
-  .print-document td,
-  .print-document th {
+  .print-document * {
     color: #1e293b !important;
   }
   .print-document a {
     color: #0f766e !important;
+  }
+  .print-document .text-emerald-700,
+  .print-document .text-emerald-800 {
+    color: #047857 !important;
+  }
+  .print-document .text-red-700,
+  .print-document .text-red-800 {
+    color: #b91c1c !important;
+  }
+  .print-document .text-yellow-800 {
+    color: #854d0e !important;
+  }
+  .print-document .text-slate-500,
+  .print-document .text-slate-600,
+  .print-document .text-slate-700 {
+    color: #334155 !important;
   }
 }

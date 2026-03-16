@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { supabase, supabaseConfigured } from '../lib/supabaseClient'
+import { supabase, supabaseConfigured, testSupabaseConnection } from '../lib/supabaseClient'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '../types/profile'
 
@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    const SESSION_TIMEOUT_MS = 3000
+    const SESSION_TIMEOUT_MS = 12000
 
     if (!supabaseConfigured) {
       setSupabaseError('Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no ambiente de build (EasyPanel → Environment) e faça um novo deploy.')
@@ -128,7 +128,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } = await Promise.race([sessionPromise, timeoutPromise])
         if (cancelled) return
         if (sessionError) {
-          setSupabaseError(sessionError.message || 'Erro ao obter sessão. Verifique VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env.')
+          const diag = await testSupabaseConnection()
+          setSupabaseError(`Sessão: ${sessionError.message || 'erro ao obter sessão'}. Diagnóstico: ${diag}`)
           setUser(null)
           setProfile(null)
           setLoading(false)
@@ -139,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (u) {
           const profilePromise = fetchProfile(u.id)
           const profileTimeout = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), Math.max(0, SESSION_TIMEOUT_MS - 1500))
+            setTimeout(() => reject(new Error('timeout')), Math.max(0, SESSION_TIMEOUT_MS - 3000))
           )
           try {
             await Promise.race([profilePromise, profileTimeout])
@@ -152,13 +153,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
         if (msg === 'timeout' && !cancelled) {
-          setSupabaseError('Conexão com o servidor demorou. Verifique sua internet e as variáveis VITE_SUPABASE_* no ambiente de build.')
+          const diag = await testSupabaseConnection()
+          setSupabaseError(`Conexão com o Supabase demorou. Diagnóstico: ${diag}`)
           setUser(null)
           setProfile(null)
         } else if (msg !== 'timeout') {
           console.error('Erro ao obter sessão Supabase:', err)
           if (!cancelled) {
-            setSupabaseError(msg || 'Não foi possível conectar ao Supabase.')
+            const diag = await testSupabaseConnection()
+            setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
             setUser(null)
             setProfile(null)
           }

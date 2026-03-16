@@ -346,7 +346,7 @@ const Resultado = () => {
             <h2 className="text-lg font-semibold text-slate-900 mb-3">
               Relatório técnico
             </h2>
-            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify">
+            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify print:prose-p:text-slate-800 print:[&_*]:!text-slate-800">
               <ReactMarkdown>{consulta.relatorio}</ReactMarkdown>
             </div>
           </section>
@@ -362,7 +362,7 @@ const Resultado = () => {
               Pontos de atenção de acordo com normas da vigilância sanitária e
               referenciais técnicos.
             </p>
-            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify">
+            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify print:prose-p:text-slate-800 print:[&_*]:!text-slate-800">
               <ReactMarkdown>{consulta.instalacoes_tecnicas}</ReactMarkdown>
             </div>
           </section>
