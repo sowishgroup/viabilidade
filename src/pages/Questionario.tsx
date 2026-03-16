@@ -223,8 +223,10 @@ const Questionario = () => {
         .single()
 
       if (insertResult.error) {
-        console.warn('Consulta não salva no Supabase:', insertResult.error)
-        navigate(`/resultado/${consultaId}`, { replace: true, state: { onlyLocal: true } })
+        const errMsg = insertResult.error.message || String(insertResult.error)
+        const code = (insertResult.error as { code?: string }).code
+        setError(`Consulta não foi salva no Supabase: ${errMsg}${code ? ` [${code}]` : ''}. Faça logout e login novamente; confira se rodou supabase/RODE-ISSO-NO-SUPABASE.sql no SQL Editor.`)
+        setSubmitting(false)
         return
       }
 

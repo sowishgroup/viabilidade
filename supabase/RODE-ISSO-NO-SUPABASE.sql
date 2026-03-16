@@ -69,7 +69,8 @@ create policy "Users can read own profile"
 
 create policy "Users can update own profile"
   on public.profiles for update
-  using (auth.uid() = id);
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
 
 create policy "Enable insert for authenticated users (own row)"
   on public.profiles for insert

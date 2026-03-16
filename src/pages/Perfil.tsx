@@ -105,6 +105,12 @@ const Perfil = () => {
       return
     }
 
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      setError('Sessão não encontrada. Faça logout e login novamente para poder salvar os dados.')
+      return
+    }
+
     setSavingProfile(true)
     setError(null)
     setSuccess(null)

@@ -35,10 +35,14 @@ function getClient(): SupabaseClient {
     global: {
       fetch: typeof window !== 'undefined' ? (...args: Parameters<typeof fetch>) => {
         return fetch(...args).then(async (res) => {
-          if (import.meta.env.DEV && !res.ok) {
+          if (!res.ok) {
             const clone = res.clone()
             const text = await clone.text()
-            console.warn('[Supabase]', res.status, res.statusText, args[0], text.slice(0, 200))
+            if (res.status === 401 || res.status === 403) {
+              console.warn('[Supabase]', res.status, res.statusText, String(args[0]).slice(0, 80), text.slice(0, 300))
+            } else if (import.meta.env.DEV) {
+              console.warn('[Supabase]', res.status, res.statusText, args[0], text.slice(0, 200))
+            }
           }
           return res
         })
