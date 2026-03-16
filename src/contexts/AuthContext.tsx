@@ -105,7 +105,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false
-    const SESSION_TIMEOUT_MS = 12000
 
     if (!supabaseConfigured) {
       setSupabaseError('Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no ambiente de build (EasyPanel → Environment) e faça um novo deploy.')
@@ -115,74 +114,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    const getSession = async () => {
+    const init = async () => {
       try {
         setSupabaseError(null)
-        const sessionPromise = supabase.auth.getSession()
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), SESSION_TIMEOUT_MS)
-        )
         const {
           data: { session },
-          error: sessionError,
-        } = await Promise.race([sessionPromise, timeoutPromise])
+          error,
+        } = await supabase.auth.getSession()
         if (cancelled) return
-        if (sessionError) {
+
+        if (error) {
+          console.error('Erro ao obter sessão Supabase:', error)
           const diag = await testSupabaseConnection()
           if (!diag.includes('REST OK')) {
-            setSupabaseError(`Sessão: ${sessionError.message || 'erro ao obter sessão'}. Diagnóstico: ${diag}`)
+            setSupabaseError(`Sessão: ${error.message || 'erro ao obter sessão'}. Diagnóstico: ${diag}`)
           }
           setUser(null)
           setProfile(null)
           setLoading(false)
           return
         }
+
         const u = session?.user ?? null
         setUser(u)
         if (u) {
-          const profilePromise = fetchProfile(u.id)
-          const profileTimeout = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), Math.max(0, SESSION_TIMEOUT_MS - 3000))
-          )
-          try {
-            await Promise.race([profilePromise, profileTimeout])
-          } catch {
-            if (!cancelled) setProfile(defaultProfile(u.id))
-          }
+          await fetchProfile(u.id)
         } else {
           setProfile(null)
         }
       } catch (err) {
+        if (cancelled) return
+        console.error('Erro ao inicializar sessão Supabase:', err)
         const msg = err instanceof Error ? err.message : String(err)
-        if (msg === 'timeout' && !cancelled) {
-          const diag = await testSupabaseConnection()
-          if (!diag.includes('REST OK')) {
-            setSupabaseError(`Conexão com o Supabase demorou. Diagnóstico: ${diag}`)
-          }
-          setUser(null)
-          setProfile(null)
-        } else if (msg !== 'timeout') {
-          console.error('Erro ao obter sessão Supabase:', err)
-          if (!cancelled) {
-            const diag = await testSupabaseConnection()
-            if (!diag.includes('REST OK')) {
-              setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
-            }
-            setUser(null)
-            setProfile(null)
-          }
+        const diag = await testSupabaseConnection()
+        if (!diag.includes('REST OK')) {
+          setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
         }
+        setUser(null)
+        setProfile(null)
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
 
-    const timeoutId = setTimeout(() => {
-      if (cancelled) return
-      setLoading(false)
-    }, SESSION_TIMEOUT_MS + 1000)
-
-    getSession()
+    init()
 
     const {
       data: { subscription },
@@ -200,7 +175,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       cancelled = true
-      clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [fetchProfile])
