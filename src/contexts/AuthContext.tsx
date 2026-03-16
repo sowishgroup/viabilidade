@@ -103,8 +103,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t)
   }, [user, profile])
 
+  const SESSION_TIMEOUT_MS = 12000
+
   useEffect(() => {
     let cancelled = false
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
 
     if (!supabaseConfigured) {
       setSupabaseError('Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no ambiente de build (EasyPanel → Environment) e faça um novo deploy.')
@@ -117,10 +120,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const init = async () => {
       try {
         setSupabaseError(null)
+        const sessionPromise = supabase.auth.getSession()
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('timeout')), SESSION_TIMEOUT_MS)
+        })
         const {
           data: { session },
           error,
-        } = await supabase.auth.getSession()
+        } = await Promise.race([sessionPromise, timeoutPromise])
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
         if (cancelled) return
 
         if (error) {
@@ -143,12 +154,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(null)
         }
       } catch (err) {
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
         if (cancelled) return
-        console.error('Erro ao inicializar sessão Supabase:', err)
         const msg = err instanceof Error ? err.message : String(err)
-        const diag = await testSupabaseConnection()
-        if (!diag.includes('REST OK')) {
-          setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
+        if (msg === 'timeout') {
+          console.warn('Supabase getSession demorou mais que', SESSION_TIMEOUT_MS, 'ms; seguindo sem sessão.')
+        } else {
+          console.error('Erro ao inicializar sessão Supabase:', err)
+          const diag = await testSupabaseConnection()
+          if (!diag.includes('REST OK')) {
+            setSupabaseError(`${msg || 'Não foi possível conectar ao Supabase.'} Diagnóstico: ${diag}`)
+          }
         }
         setUser(null)
         setProfile(null)
@@ -175,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       cancelled = true
+      if (timeoutId) clearTimeout(timeoutId)
       subscription.unsubscribe()
     }
   }, [fetchProfile])
