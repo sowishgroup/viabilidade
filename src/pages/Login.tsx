@@ -11,27 +11,10 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const { signIn, signUp, isAuthenticated, loading } = useAuth()
+  const { signIn, signUp, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? '/dashboard'
-
-  if (loading) {
-    return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 py-12 bg-[#0f172a]/95 rounded-2xl">
-        <img
-          src={`${import.meta.env.BASE_URL}logo-sowish.png`}
-          alt="Sowish"
-          className="w-28 h-28 object-contain animate-pulse"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-        />
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-sm text-white/90">Carregando...</p>
-        </div>
-      </div>
-    )
-  }
 
   if (isAuthenticated) {
     return <Navigate to={from} replace />
