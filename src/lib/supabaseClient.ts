@@ -7,8 +7,9 @@ const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim()
 const runtimeUrl = (typeof window !== 'undefined' && (window as unknown as WindowSupabase).__SOWISH_SUPABASE_URL__) ? String((window as unknown as WindowSupabase).__SOWISH_SUPABASE_URL__).trim() : ''
 const runtimeKey = (typeof window !== 'undefined' && (window as unknown as WindowSupabase).__SOWISH_SUPABASE_ANON_KEY__) ? String((window as unknown as WindowSupabase).__SOWISH_SUPABASE_ANON_KEY__).trim() : ''
 
-const supabaseUrl = envUrl || runtimeUrl
-const supabaseAnonKey = envKey || runtimeKey
+// Prioridade: credenciais do index.html (runtime) > variáveis de build – para evitar usar placeholder ou valor errado
+const supabaseUrl = runtimeUrl || envUrl
+const supabaseAnonKey = runtimeKey || envKey
 
 const url = supabaseUrl || 'https://placeholder.supabase.co'
 const key = supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder'

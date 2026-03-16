@@ -43,3 +43,13 @@ Em **produção** o navegador deve receber o **build** (pasta `dist/`), onde o `
 - Abra as ferramentas do desenvolvedor (F12) → aba **Rede**. Recarregue a página e veja se algum arquivo `.js` (ex: `/assets/index-xxx.js`) retorna **404** ou **tipo errado** (ex: text/plain).
 - Confirme que o deploy está usando a **imagem construída pelo Dockerfile**, não “Build: npm run build” + “Start: npm run dev” ou similar.
 - Após ~6 segundos, se o app não carregar, a própria página mostra “O app não carregou” e um botão **Recarregar**; use isso para tentar de novo depois de corrigir o deploy.
+
+## Perfil não atualiza (nome, telefone, foto) – comunicação com Supabase
+
+**Não é necessário excluir nada.** Siga na ordem:
+
+1. **No app:** faça **logout** e **login de novo**. Isso renova a sessão e garante que o token está associado ao Supabase correto (o do `index.html`).
+2. **Supabase Dashboard** → **Authentication** → **URL Configuration**: em **Redirect URLs** inclua exatamente a URL do app (ex.: `https://viabilidade.sowishgroup.com/**` e `https://viabilidade.sowishgroup.com`). Em **Site URL** use a mesma base.
+3. **Supabase** → **SQL Editor**: rode de novo o script **`supabase/RODE-ISSO-NO-SUPABASE.sql`** inteiro. Ele é idempotente (pode rodar várias vezes) e recria as políticas RLS da tabela `profiles`.
+4. Confira em **Table Editor** → **profiles** se as colunas `full_name`, `phone`, `especialidade`, `cpf_cnpj`, `avatar_url` existem. Se faltar alguma, o script acima adiciona.
+5. Depois de alterar o Supabase, faça um **novo deploy** do app (ou ao menos limpe o cache do navegador e teste em aba anônima).

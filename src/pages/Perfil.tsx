@@ -165,11 +165,12 @@ const Perfil = () => {
       }
 
       if (updateError) {
-        const err = updateError as { message?: string; details?: string; hint?: string }
+        const err = updateError as { message?: string; details?: string; hint?: string; code?: string }
         const msg = err?.message ?? String(updateError)
         const detail = err?.details ? ` (${err.details})` : ''
         const hint = err?.hint ? ` Dica: ${err.hint}` : ''
-        throw new Error(`${msg}${detail}${hint}`)
+        const code = err?.code ? ` [${err.code}]` : ''
+        throw new Error(`${msg}${detail}${hint}${code}`)
       }
       setSuccess('Dados atualizados com sucesso.')
       refreshProfile().catch(() => {})
@@ -250,7 +251,8 @@ const Perfil = () => {
           <h2 className="text-base font-semibold text-slate-900 mb-3">Dados cadastrais</h2>
           {error && (
             <div className="mb-3 rounded-xl border border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">
-              {error}
+              <p>{error}</p>
+              <p className="mt-2 text-red-600/90">Se os dados não salvarem, faça <strong>logout e login novamente</strong> para renovar a sessão. Confira também no Supabase se o script <code className="bg-red-100 px-1 rounded">RODE-ISSO-NO-SUPABASE.sql</code> foi executado.</p>
             </div>
           )}
           {success && (
