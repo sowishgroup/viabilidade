@@ -260,15 +260,19 @@ const Resultado = () => {
 
       {/* Área que será impressa/PDF (cabeçalho + relatório + avisos) */}
       <div className="print-document max-w-4xl mx-auto">
-        {/* Cabeçalho do programa (sempre visível na tela; na impressão vira o topo do documento) */}
-        <header className="hidden print:block print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4">
+        {/* Cabeçalho do programa (tela e impressão; na impressão mantém apenas a logo e textos) */}
+        <header className="hidden print:flex print:items-center print:justify-between print:mb-8 print:border-b-2 print:border-slate-800 print:pb-4">
           <div className="flex items-center gap-3">
-            <img src={`${import.meta.env.BASE_URL}logo-sowish.png`} alt="" className="h-10 w-10 object-contain print:block" />
+            <img
+              src={`${import.meta.env.BASE_URL}logo-sowish.png`}
+              alt="Sowish Viabilidade"
+              className="h-10 w-10 object-contain"
+            />
             <div>
-              <span className="block text-xs tracking-[0.2em] uppercase text-slate-500 print:text-slate-600">
+              <span className="block text-[10px] tracking-[0.2em] uppercase text-slate-600">
                 Sowish Viabilidade
               </span>
-              <span className="block text-lg font-semibold text-slate-900">
+              <span className="block text-base font-semibold text-slate-900">
                 Laudo de Viabilidade Arquitetônica
               </span>
             </div>
@@ -279,16 +283,16 @@ const Resultado = () => {
           </div>
         </header>
 
-        <div className="space-y-6 print:space-y-4">
+        <div className="space-y-6 print:space-y-4 print:text-[12px]">
         {/* Seção: título + status + resumo rápido */}
         <section className="bg-white/45 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6 sm:p-8 print:bg-white print:shadow-none print:border-none print:p-0">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-900">
+              <h1 className="text-2xl print:text-xl font-semibold text-slate-900">
                 Resultado da viabilidade
               </h1>
               {consulta.area_total != null && (
-                <p className="text-slate-700 mt-1 text-sm">
+                <p className="text-slate-700 mt-1 text-sm print:text-xs">
                   Área recomendada:&nbsp;
                   <strong className="text-slate-900">
                     {consulta.area_total} m²
@@ -332,7 +336,7 @@ const Resultado = () => {
                 </div>
               )}
               {statusDescription && (
-                <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-800">
+                <p className="mt-2 text-xs sm:text-sm print:text-xs leading-relaxed text-slate-800">
                   {statusDescription}
                 </p>
               )}
@@ -343,10 +347,10 @@ const Resultado = () => {
         {/* Seção: Relatório principal */}
         {consulta.relatorio && (
           <section className="bg-white/45 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6 sm:p-8 print:bg-white print:shadow-none print:border-none print:p-0 print:mt-2">
-            <h2 className="text-lg font-semibold text-slate-900 mb-3">
+            <h2 className="text-lg print:text-base font-semibold text-slate-900 mb-3">
               Relatório técnico
             </h2>
-            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify print:prose-p:text-slate-800 print:[&_*]:!text-slate-800">
+            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify print:prose-p:text-slate-800 print:[&_*]:!text-slate-800 print:text-[11px]">
               <ReactMarkdown>{consulta.relatorio}</ReactMarkdown>
             </div>
           </section>
@@ -355,22 +359,21 @@ const Resultado = () => {
         {/* Seção: Instalações técnicas */}
         {consulta.instalacoes_tecnicas && (
           <section className="bg-white/45 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6 sm:p-8 print:bg-white print:shadow-none print:border-none print:p-0">
-            <h2 className="text-lg font-semibold text-slate-900 mb-3">
+            <h2 className="text-lg print:text-base font-semibold text-slate-900 mb-3">
               Instalações técnicas e pontos de atenção
             </h2>
             <p className="text-xs text-slate-500 mb-3">
               Pontos de atenção de acordo com normas da vigilância sanitária e
               referenciais técnicos.
             </p>
-            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify print:prose-p:text-slate-800 print:[&_*]:!text-slate-800">
+            <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-strong:text-slate-900 prose-p:text-slate-800 prose-p:leading-relaxed prose-p:text-justify print:prose-p:text-slate-800 print:[&_*]:!text-slate-800 print:text-[11px]">
               <ReactMarkdown>{consulta.instalacoes_tecnicas}</ReactMarkdown>
             </div>
           </section>
         )}
 
         {/* Nenhum conteúdo adicional */}
-        {!consulta.imagem_url &&
-          !consulta.relatorio &&
+        {!consulta.relatorio &&
           !consulta.instalacoes_tecnicas && (
             <section className="bg-white/45 backdrop-blur-sm rounded-xl shadow-sm border border-white/30 p-6 text-center text-slate-500 print:bg-white print:shadow-none print:border-none print:p-0">
               Nenhum conteúdo adicional para exibir para esta consulta.
@@ -379,8 +382,8 @@ const Resultado = () => {
 
         {/* Aviso legal (tela + impressão) */}
         <section className="mt-2 print:mt-4">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-800 rounded-r-xl shadow-sm print:shadow-none print:bg-yellow-50 print:border-l-4 print:border-yellow-400 print:p-4 print:break-inside-avoid">
-            <p className="font-semibold mb-1">⚠️ Aviso legal</p>
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm print:text-xs text-yellow-800 rounded-r-xl shadow-sm print:shadow-none print:bg-yellow-50 print:border-l-4 print:border-yellow-400 print:p-4 print:break-inside-avoid">
+            <p className="font-semibold mb-1">Aviso legal</p>
             <p className="leading-relaxed text-justify">
               Este é um laudo preliminar de viabilidade arquitetônica gerado
               com apoio de modelos de Inteligência Artificial e referenciais
@@ -394,24 +397,6 @@ const Resultado = () => {
             </p>
           </div>
         </section>
-
-        {/* Imagem 3D (final do laudo) */}
-        {consulta.imagem_url && (
-          <section className="mt-6 print:mt-10 print:break-before-page">
-            <figure className="bg-white/45 backdrop-blur-sm rounded-xl shadow-md overflow-hidden border border-white/30 px-4 sm:px-6 pt-6 pb-4 print:bg-white print:border-none print:shadow-none print:px-0 print:pt-0 print:pb-0 print:break-inside-avoid">
-              <div className="rounded-2xl overflow-hidden shadow-[0_18px_45px_rgba(15,23,42,0.25)] bg-slate-100">
-                <img
-                  src={consulta.imagem_url}
-                  alt="Perspectiva 3D ilustrativa do ambiente analisado"
-                  className="w-full max-w-3xl mx-auto object-contain max-h-[480px]"
-                />
-              </div>
-              <figcaption className="text-center text-xs text-slate-500 mt-3">
-                Perspectiva 3D ilustrativa do ambiente analisado
-              </figcaption>
-            </figure>
-          </section>
-        )}
 
         </div>
       </div>
@@ -429,27 +414,13 @@ const Resultado = () => {
             type="button"
             onClick={() => {
               const especialidade = consulta.especialidade ?? 'serviço em saúde'
-              const status = getStatusText(statusTone)
-              const areaText =
-                consulta.area_total != null
-                  ? `${consulta.area_total} m²`
-                  : 'não informada'
-              const resumo = getResumoLaudo(consulta)
               const subject = `Laudo de Viabilidade - ${especialidade}`
               const body = [
-                `Olá! Segue o resumo da nossa análise de viabilidade para a clínica de ${especialidade}.`,
+                'Segue a avaliação feita no Sowish Viabilidade.',
                 '',
-                `Status: ${status}`,
-                `Área Estimada: ${areaText}`,
-                '',
-                resumo ? `Resumo do laudo: ${resumo}` : '',
-                '',
-                'Lembre-se: Este é um laudo preliminar gerado por Inteligência Artificial e não substitui o projeto de um arquiteto.',
-                '',
-                'Consulte um especialista antes de tomar qualquer decisão com base neste documento.',
-              ]
-                .filter(Boolean)
-                .join('\n')
+                'Para visualizar todos os detalhes, abra o PDF gerado pelo sistema ou acesse o link abaixo:',
+                window.location.href,
+              ].join('\n')
 
               const mailto = `mailto:?subject=${encodeURIComponent(
                 subject,
@@ -464,24 +435,13 @@ const Resultado = () => {
             type="button"
             onClick={() => {
               const especialidade = consulta.especialidade ?? 'serviço em saúde'
-              const status = getStatusText(statusTone)
-              const areaText =
-                consulta.area_total != null
-                  ? `${consulta.area_total} m²`
-                  : 'não informada'
-              const resumo = getResumoLaudo(consulta)
               const texto = [
-                `🏥 *Análise de Viabilidade - ${especialidade}*`,
+                `Análise de Viabilidade - ${especialidade}`,
                 '',
-                `*Status:* ${status}`,
-                `*Área Estimada:* ${areaText}`,
+                'Segue a avaliação feita no Sowish Viabilidade.',
                 '',
-                '*Resumo do Laudo:*',
-                resumo || '(sem resumo disponível)',
-                '',
-                '⚠️ _Aviso: Este é um laudo preliminar gerado por IA (RDC 50) e não substitui avaliação técnica no local._',
-                '',
-                '_Consulte um especialista antes de tomar qualquer decisão com base neste documento._',
+                'Para ver o laudo completo, abra o PDF gerado pelo sistema ou acesse o link abaixo:',
+                window.location.href,
               ].join('\n')
 
               const url = `https://wa.me/?text=${encodeURIComponent(texto)}`
