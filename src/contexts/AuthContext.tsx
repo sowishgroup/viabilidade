@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(t)
   }, [user, profile])
 
-  const SESSION_TIMEOUT_MS = 12000
+  const SESSION_TIMEOUT_MS = 22000
 
   useEffect(() => {
     let cancelled = false
@@ -161,7 +161,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return
         const msg = err instanceof Error ? err.message : String(err)
         if (msg === 'timeout') {
-          console.warn('Supabase getSession demorou mais que', SESSION_TIMEOUT_MS, 'ms; seguindo sem sessão.')
+          if (import.meta.env.DEV) {
+            console.warn('Supabase getSession demorou; seguindo sem sessão. (Em produção esse aviso não aparece.)')
+          }
         } else {
           console.error('Erro ao inicializar sessão Supabase:', err)
           const diag = await testSupabaseConnection()

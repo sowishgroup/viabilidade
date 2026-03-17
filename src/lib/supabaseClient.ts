@@ -5,6 +5,7 @@ type WindowSupabase = { __SOWISH_SUPABASE_URL__?: string; __SOWISH_SUPABASE_ANON
 function getConfig() {
   const envUrl = (import.meta.env.VITE_SUPABASE_URL ?? '').trim()
   const envKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim()
+  // Prioridade: sempre usar o que está no index.html (window) para evitar URL antiga vinda do build
   const runtimeUrl = (typeof window !== 'undefined' && (window as unknown as WindowSupabase).__SOWISH_SUPABASE_URL__) ? String((window as unknown as WindowSupabase).__SOWISH_SUPABASE_URL__).trim() : ''
   const runtimeKey = (typeof window !== 'undefined' && (window as unknown as WindowSupabase).__SOWISH_SUPABASE_ANON_KEY__) ? String((window as unknown as WindowSupabase).__SOWISH_SUPABASE_ANON_KEY__).trim() : ''
   const url = (runtimeUrl || envUrl) || 'https://placeholder.supabase.co'

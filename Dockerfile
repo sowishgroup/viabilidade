@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY . .
 
-# Variáveis de ambiente em tempo de build (Vite embute no bundle)
+# Opcional: se usar build args, use a mesma URL/anon key do index.html (novo projeto = nova URL)
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 ARG VITE_N8N_WEBHOOK_URL
@@ -27,7 +27,9 @@ RUN echo 'server { \
   listen 80; \
   root /usr/share/nginx/html; \
   index index.html; \
-  location / { try_files $uri $uri/ /index.html; } \
+  location = / { add_header Cache-Control "no-store, no-cache, must-revalidate"; try_files /index.html =404; } \
+  location / { try_files $uri $uri/ @spa; } \
+  location @spa { add_header Cache-Control "no-store, no-cache, must-revalidate"; try_files /index.html =404; } \
   location ~* \.(js|mjs)$ { add_header Content-Type "application/javascript"; } \
   location = /manifest.json { add_header Content-Type "application/manifest+json"; } \
   location /health { return 200; add_header Content-Type text/plain; } \
